@@ -33,6 +33,7 @@ class WebPage():
         try:
             element_on_page=self.wait.until(EC.presence_of_element_located(self.elements_selectors.get(element)))
         except:
+            self.browser.save_screenshot(f"screenshorts/{time.strftime('%Y%m%d_%H%M%S')}.png")  # {time.strftime('%Y%m%d_%H%M%S')}
             raise AssertionError(f'The element {element} did not appear on the page')
         return element_on_page
 
