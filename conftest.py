@@ -20,7 +20,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session")
 def base_url(request):
-    logging.info(f"base-url = {request.config.getoption("--base_url")}")
+    logging.info(f'base-url = {request.config.getoption("--base_url")}')
     return request.config.getoption("--base_url")
 
 
