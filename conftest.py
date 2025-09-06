@@ -105,6 +105,6 @@ def api_connecter(base_url):
 
 @pytest.fixture()
 def page(base_url, browser):
-    p = RestApiConnecter(browser, base_url)
+    p = WebPage(browser, base_url)
     logging.info('')
     return p
