@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chromium.options import ChromiumOptions
 from selenium.webdriver.chromium.service import ChromiumService
 from selenium.webdriver.firefox.options import Options as FFOptions
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 import logging
 import datetime
@@ -24,7 +25,7 @@ def base_url(request):
     return request.config.getoption("--base_url")
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def browser(request):
     driver = None
     browser_name = request.config.getoption("--browser")
@@ -64,11 +65,16 @@ def browser(request):
                 options=options)
             driver.maximize_window()
     elif browser_name in ["ff","fox","firefox"]:
+        logger.info("browser = Firefox")
         options=FFOptions()
         if headless:
             options.add_argument("headless")
+            logger.info("headless")
         if remote == "False":
-            driver = webdriver.Firefox(options=options)
+            logger.info(options)
+            service = Service(executable_path='/snap/bin/geckodriver')
+            driver = webdriver.Firefox(service=service, options=options)
+            logger.info('success')
         else:
             capabilities = {
                 "browserName": "firefox",
@@ -103,7 +109,7 @@ def browser(request):
 def api_connecter(base_url):
     return RestApiConnecter(base_url)
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def page(base_url, browser):
     p = WebPage(browser, base_url)
     logging.info('')

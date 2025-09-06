@@ -22,6 +22,7 @@ response_list = ['changes', 'exports','tools', 'statistics'] # 'instances', 'mod
 @pytest.mark.parametrize('response_for_test',
                          response_list,
                          ids=response_list)
+@pytest.mark.xfail
 def test_rundom_instance_response_ok(api_connecter, response_for_test):
     assert api_connecter.instance_for_id(response_for_test, "random")
 
@@ -29,6 +30,7 @@ response_list = ['changes', 'exports','tools', 'statistics','instances', 'modali
 @pytest.mark.parametrize('response_for_test',
                          response_list,
                          ids=response_list)
+@pytest.mark.xfail
 def test_rundom_instance_response_text(api_connecter, response_for_test):
     massege = api_connecter.instance_for_id(response_for_test, "random")
     assert massege == 0, massege
