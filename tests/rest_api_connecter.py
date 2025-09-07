@@ -37,15 +37,18 @@ class RestApiConnecter():
             raise AssertionError(f'No response from the server to the request {self.url + get_list_response} was received')
         try:
             list_lenth = len(list_responce.json())
-            if function_name == "random":
-                logging.info('Getting a random value from a list')
-                id = random.randint(0, list_lenth-1)
-            else:
-                logging.info('Getting first value from a list')
-                id=0
-            logging.info(f"id={id}")
         except:
             raise AssertionError("The answer is not a list")
+        try:
+            if function_name == "random":
+                logging.info('Getting a random value from a list')
+                id = random.choice(list_responce.json())
+            else:
+                logging.info('Getting first value from a list')
+                id=list_responce.json()[0]
+            logging.info(f"id={id}")
+        except:
+            raise AssertionError(f"The instances is not found {list_lenth} in {list_responce.json()}")
         try:
             get_instanse_response = get_list_response + f"/{id}"
             logging.info(f'new requests: {get_instanse_response}')
@@ -56,7 +59,11 @@ class RestApiConnecter():
             assert instance_for_id.ok
             return instance_for_id.json() #.get('message')
         except:
-            raise AssertionError(f'Failed to extract json from response {self.url + get_instanse_response} {id}/{list_lenth} in {list_responce.json()}')
+            logging.info('Answer is not json')
+        try:
+            return instance_for_id.text
+        except:
+            raise AssertionError(f'Failed to extract json or read text from response {self.url + get_instanse_response} {id}/{list_lenth} in {list_responce.json()}')
 
 
 

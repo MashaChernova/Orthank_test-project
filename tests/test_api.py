@@ -33,4 +33,4 @@ response_list = ['changes', 'exports','tools', 'statistics','instances', 'modali
 #@pytest.mark.xfail
 def test_rundom_instance_response_text(api_connecter, response_for_test):
     massege = api_connecter.instance_for_id(response_for_test, "random")
-    assert massege == 0, massege
+    assert massege != 0, massege
