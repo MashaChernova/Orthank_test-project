@@ -9,10 +9,10 @@ import random
 class RestApiConnecter():
 
     def __init__(self, url):
-        self.url = url
+        self.url = "http://" + url + "/"
 
     def response_status_ok(self, response_for_test):
-        response = requests.request("GET", self.url + response_for_test)
+        response = requests.request("GET", self.url + response_for_test, auth=('orthanc', 'orthanc'))
         try:
             if response.ok:
                 return True
@@ -23,7 +23,7 @@ class RestApiConnecter():
 
     def message_response(self, response_for_test):
         logging.info("massage response funktion")
-        response = requests.request("GET", self.url + response_for_test)
+        response = requests.request("GET", self.url + response_for_test, auth=('orthanc', 'orthanc'))
         assert response.ok
         try:
             return response.json()
@@ -32,7 +32,7 @@ class RestApiConnecter():
 
     def instance_for_id(self, get_list_response, function_name):
         try:
-            list_responce = requests.request("GET", self.url + get_list_response)
+            list_responce = requests.request("GET", self.url + get_list_response, auth=('orthanc', 'orthanc'))
         except:
             raise AssertionError(f'No response from the server to the request {self.url + get_list_response} was received')
         try:
@@ -49,7 +49,7 @@ class RestApiConnecter():
         try:
             get_instanse_response = get_list_response + f"/{id}"
             logging.info(f'new requests: {get_instanse_response}')
-            instance_for_id = requests.request("GET", self.url + get_instanse_response)
+            instance_for_id = requests.request("GET", self.url + get_instanse_response, auth=('orthanc', 'orthanc'))
         except:
             raise AssertionError(f"Unable to retrieve response for request {self.url + get_instanse_response}")
         try:

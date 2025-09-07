@@ -1,3 +1,5 @@
+import logging
+
 import selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -25,9 +27,24 @@ class WebPage():
     def __init__(self, browser, url):
         self.browser = browser
         self.url = url
-        self.browser.get(self.url)
+        self.browser.get('http://orthanc:orthanc@' + self.url)
         self.wait = WebDriverWait(self.browser, 5)
         self.wait.until(EC.title_is(self.TITLE))
+        self.open_main_page()
+        self.wait.until(EC.title_is(self.TITLE))
+
+    def open_main_page(self):
+        self.browser.get('http://' + self.url)
+        try:
+            alert = self.browser.switch_to.alert()
+            alert.authenticate("orthanc", "orthanc")
+        except:
+            logging.info("dont need authorization")
+        try:
+            self.wait.until(EC.title_is(self.TITLE))
+        except:
+            raise AssertionError('The main page did not open')
+
 
     def element_in_page(self, element):
         try:
@@ -48,10 +65,8 @@ class WebPage():
             raise AssertionError('Element is not clickable or epsent')
         return True
 
-    def open_main_page(self):
-        self.browser.get(self.url)
-        try:
-            self.wait.until(EC.title_is(self.TITLE))
-        except:
-            raise AssertionError('The main page did not open')
+
+
+    def get_title(self):
+        return self.browser.title
 
