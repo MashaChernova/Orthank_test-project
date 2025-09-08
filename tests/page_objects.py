@@ -4,6 +4,7 @@ import selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 import time
 
 class WebPage():
@@ -15,14 +16,21 @@ class WebPage():
     LIST_PLAGINS_BUTTON = By.CSS_SELECTOR, '[href="#plugins"]'
     FIND_STUDIES_BUTTON = By.CSS_SELECTOR, '[href="#find-studies"]'
     OK_BUTTON = By.ID, "lookup-submit"
+    LIST_HEADER = By.CLASS_NAME, "ui-li-heading"
+    DATA_TYPE_BUTTON = By.ID, "lookup-study-date"
+    DATA_FILD = By.ID, "lookup-study-date-specific"
+
+
     elements_selectors = {
             'patient id': PATIENT_ID_FILD,
             'patient name': PATIENT_NAME_FILD,
             'patient all button': FIND_PATIENT_BUTTON,
             'accsession number': ACCSESSION_NUMBER_FILD,
-            'list plugins': (By.CSS_SELECTOR, '[href="#plugins"]')
-
+            'list plugins': (By.CSS_SELECTOR, '[href="#plugins"]'),
+            'ok button': OK_BUTTON,
+            'study header': LIST_HEADER
         }
+
 
     def __init__(self, browser, url):
         self.browser = browser
@@ -54,6 +62,7 @@ class WebPage():
             raise AssertionError(f'The element {element} did not appear on the page')
         return element_on_page
 
+
     def element_click(self, element):
         try:
             selector = self.elements_selectors.get(element)
@@ -66,7 +75,41 @@ class WebPage():
         return True
 
 
+    def element_input(self, fild_for_inpute_name, text_for_input):
+        try:
+            field_for_input = self.element_in_page(fild_for_inpute_name)
+            field_for_input.clear()
+            field_for_input.send_keys(text_for_input)
+        except:
+            raise AssertionError('Failed to enter data')
+
 
     def get_title(self):
         return self.browser.title
+
+
+    def get_element_text(self, element):
+        try:
+            return self.element_in_page(element).text
+        except:
+            raise AssertionError('Failed to get text on element')
+
+
+    def data_input(self, data):
+        try:
+            button = self.wait.until(EC.presence_of_element_located(self.DATA_TYPE_BUTTON))
+        except:
+            raise AssertionError('Element not found')
+        try:
+            select = Select(button)
+            select.select_by_value('specific')
+        except:
+            raise AssertionError('Failed to select Specific data')
+        try:
+            data_fild = self.wait.until(EC.presence_of_element_located(self.DATA_FILD))
+            data_fild.clear()
+            data_fild.send_keys(data)
+        except:
+            raise AssertionError(f"Failed to enter date {data}")
+
 

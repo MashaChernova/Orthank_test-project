@@ -11,6 +11,7 @@ class RestApiConnecter():
     def __init__(self, url):
         self.url = "http://" + url + "/"
 
+
     def response_status_ok(self, response_for_test):
         response = requests.request("GET", self.url + response_for_test, auth=('orthanc', 'orthanc'))
         try:
@@ -21,6 +22,7 @@ class RestApiConnecter():
         except:
             raise AssertionError('Failed to get response status')
 
+
     def message_response(self, response_for_test):
         logging.info("massage response funktion")
         response = requests.request("GET", self.url + response_for_test, auth=('orthanc', 'orthanc'))
@@ -29,6 +31,7 @@ class RestApiConnecter():
             return response.json()
         except:
             raise AssertionError("Unable to read response text")
+
 
     def instance_for_id(self, get_list_response, function_name):
         try:
@@ -56,15 +59,81 @@ class RestApiConnecter():
         except:
             raise AssertionError(f"Unable to retrieve response for request {self.url + get_instanse_response}")
         try:
-            assert instance_for_id.ok
+            assert instance_for_id.ok, "request status isn't ok"
+            assert id in instance_for_id.json()
             return instance_for_id.json() #.get('message')
         except:
             logging.info('Answer is not json')
         try:
+            assert id in instance_for_id.text
             return instance_for_id.text
         except:
             raise AssertionError(f'Failed to extract json or read text from response {self.url + get_instanse_response} {id}/{list_lenth} in {list_responce.json()}')
 
+
+    def list_lenth(self, get_list_response):
+        try:
+            list_responce = requests.request("GET", self.url + get_list_response, auth=('orthanc', 'orthanc'))
+        except:
+            raise AssertionError(f'No response from the server to the request {self.url + get_list_response} was received')
+        try:
+            list_len = len(list_responce.json())
+            logger.info(f"List length {list_len}")
+            return list_len
+        except:
+            raise AssertionError("The answer is not a list")
+
+
+    def get_number_for_list(self, get_list_response, type):
+        try:
+            list_responce = requests.request("GET", self.url + get_list_response, auth=('orthanc', 'orthanc'))
+        except:
+            raise AssertionError(
+                f'No response from the server to the request {self.url + get_list_response} was received')
+        try:
+            list_lenth = len(list_responce.json())
+        except:
+            raise AssertionError("The answer is not a list")
+        if type in ['first', 0]:
+            return 0
+        elif type in ['last', -1]:
+            return -1
+        elif type == 'random':
+            num = random.randint(1, list_lenth - 2)
+            # logger.info(f'Random value of list element {num} received')
+            return num
+        else:
+            if type < list_lenth:
+                return type
+            else:
+                raise AssertionError('This value is not in the list')
+
+
+
+    def get_patient_name(self, patient_number):
+        patients_list = self.message_response('patients')
+        patient_for_test = patients_list[patient_number]
+        patient_info = self.message_response(f'patients/{patient_for_test}')
+        assert patient_info.get('ID') == patient_for_test, f"Information about the specified user was not received: {patient_info}"
+        patient_name = self.message_response(f'patients/{patient_for_test}/module').get('0010,0010').get('Value')
+        return patient_name
+
+    def get_study_info(self, study_number, tag_name):
+        try:
+            study_id = self.message_response('studies')[study_number]
+            study_info = self.message_response(f'studies/{study_id}')
+        except:
+            raise AssertionError('Unable to retrieve research information')
+        if tag_name in ["StudyDate", "StudyID", "StudyDescription"]:
+            try:
+                return study_info.get('MainDicomTags').get(tag_name)
+            except:
+                raise AssertionError('Failed to get tag value')
+        if tag_name in ["PatientBirthDate", "PatientID", "PatientName", "PatientSex"]:
+            try:
+                return study_info.get('PatientMainDicomTags').get(tag_name)
+            except:
+                raise AssertionError('Failed to get tag value')
 
 
 
