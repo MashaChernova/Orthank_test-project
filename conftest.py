@@ -16,7 +16,7 @@ def pytest_addoption(parser):
     parser.addoption("--browser", help="Browser to run tests", default="chrome")
     parser.addoption("--drivers", help="Driver storage", default=r"C:\Users\Mariya\Downloads\drivers")
     parser.addoption("--headless", action="store_true", help="Browser run headless")
-    parser.addoption("--remote", help="selenoid", default="True")
+    parser.addoption("--remote", help="selenoid", default="False")
     parser.addoption("--base_url", help="Base application url", default="orthanc.uclouvain.be/demo")
 
 @pytest.fixture(scope="session")
@@ -107,10 +107,14 @@ def browser(request):
 
 @pytest.fixture()
 def api_connecter(base_url):
-    return RestApiConnecter(base_url)
+    session_connecter = RestApiConnecter(base_url)
+    yield session_connecter
+    session_connecter.__del__()
+
 
 @pytest.fixture()
 def page(base_url, browser):
     p = WebPage(browser, base_url)
     logging.info('')
     return p
+

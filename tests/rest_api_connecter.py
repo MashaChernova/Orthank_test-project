@@ -10,6 +10,14 @@ class RestApiConnecter():
 
     def __init__(self, url):
         self.url = "http://" + url + "/"
+        for i in range(6):
+            self.upload_instances(f'studies/{i+1}.dcm')
+        logging.info('исследования загружены')
+
+    def  __del__(self):
+        studies_id_list = self.message_response('studies')
+        for study_id in studies_id_list:
+            self.remove_instances('studies', study_id)
 
 
     def response_status_ok(self, response_for_test):
@@ -109,7 +117,6 @@ class RestApiConnecter():
                 raise AssertionError('This value is not in the list')
 
 
-
     def get_patient_name(self, patient_number):
         patients_list = self.message_response('patients')
         patient_for_test = patients_list[patient_number]
@@ -118,9 +125,13 @@ class RestApiConnecter():
         patient_name = self.message_response(f'patients/{patient_for_test}/module').get('0010,0010').get('Value')
         return patient_name
 
+
     def get_study_info(self, study_number, tag_name):
         try:
-            study_id = self.message_response('studies')[study_number]
+            if type(study_number) == int:
+                study_id = self.message_response('studies')[study_number]
+            else:
+                study_id = study_number
             study_info = self.message_response(f'studies/{study_id}')
         except:
             raise AssertionError('Unable to retrieve research information')
@@ -129,11 +140,37 @@ class RestApiConnecter():
                 return study_info.get('MainDicomTags').get(tag_name)
             except:
                 raise AssertionError('Failed to get tag value')
-        if tag_name in ["PatientBirthDate", "PatientID", "PatientName", "PatientSex"]:
+        elif tag_name in ["PatientBirthDate", "PatientID", "PatientName", "PatientSex"]:
             try:
                 return study_info.get('PatientMainDicomTags').get(tag_name)
             except:
                 raise AssertionError('Failed to get tag value')
+        else:
+            try:
+                return study_info.get(tag_name)
+            except:
+                raise AssertionError('Failed to get tag value')
+
+
+    def upload_instances(self, file_for_upload):
+        try:
+            with open(file_for_upload, 'rb') as f:
+                file_data = f.read()
+            response = requests.request("POST", self.url + 'instances', auth=('orthanc', 'orthanc'), data=file_data)
+        except Exception as e:
+            raise AssertionError(f'Failed to send request: {str(e)}')
+        try:
+            return response.json()
+        except:
+            raise AssertionError(f'The report is not json, response code: {response.status_code}')
+
+
+    def remove_instances(self, request_for_remove, instance_id):
+        try:
+            req_url = self.url + f'{request_for_remove}/{instance_id}'
+            requests.request("DELETE", req_url, auth=('orthanc', 'orthanc'))
+        except Exception as e:
+            raise AssertionError(f'Failed to send request: {str(e)}')
 
 
 

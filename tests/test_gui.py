@@ -32,7 +32,7 @@ def test_patients_name_search(api_connecter, page, patient_number):
 
 
 @pytest.mark.parametrize('patient_number', [-1, 0, 1, 'random'])
-@pytest.mark.only
+@pytest.mark.only2
 def test_date_search(api_connecter, page, patient_number):
     i = api_connecter.get_number_for_list('patients', patient_number)
     study_data = api_connecter.get_study_info(i, 'StudyDate')
