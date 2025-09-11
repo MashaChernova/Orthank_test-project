@@ -105,7 +105,7 @@ def browser(request):
     logger.info("===> Test finished at %s" % datetime.datetime.now())
     driver.quit()
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def api_connecter(base_url):
     session_connecter = RestApiConnecter(base_url)
     yield session_connecter
