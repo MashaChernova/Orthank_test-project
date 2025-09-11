@@ -16,7 +16,7 @@ def pytest_addoption(parser):
     parser.addoption("--browser", help="Browser to run tests", default="chrome")
     parser.addoption("--drivers", help="Driver storage", default=r"C:\Users\Mariya\Downloads\drivers")
     parser.addoption("--headless", action="store_true", help="Browser run headless")
-    parser.addoption("--remote", help="selenoid", default="False")
+    parser.addoption("--remote", help="selenoid", default="True")
     parser.addoption("--base_url", help="Base application url", default="orthanc.uclouvain.be/demo")
 
 @pytest.fixture(scope="session")
