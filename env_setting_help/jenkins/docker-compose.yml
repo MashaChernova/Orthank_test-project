@@ -1,0 +1,15 @@
+services:
+
+   jenkins:
+    image:  myjenkins3
+    build:
+      context: .        # директория с Dockerfile
+      dockerfile: Dockerfile  # если имя другое, укажи здесь
+    container_name: jenkins
+    hostname: jenkins
+    ports: ['8080:8080','50000:50000']
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./jenkins_home_2:/var/jenkins_home
+
+
