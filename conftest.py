@@ -102,6 +102,7 @@ def browser(request):
 
     logger.info("Browser %s started" % browser)
     yield driver
+    driver.set_window_size(1920, 1080)
     logger.info("===> Test finished at %s" % datetime.datetime.now())
     driver.quit()
 
