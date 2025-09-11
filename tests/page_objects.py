@@ -92,7 +92,7 @@ class WebPage():
         try:
             return self.element_in_page(element).text
         except:
-            raise AssertionError('Failed to get text on element')
+            raise AssertionError(f'Failed to get text on element {element}')
 
 
     def data_input(self, data):
