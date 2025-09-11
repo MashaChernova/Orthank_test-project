@@ -112,7 +112,7 @@ def api_connecter(base_url):
     session_connecter.__del__()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def page(base_url, browser):
     p = WebPage(browser, base_url)
     logging.info('')
